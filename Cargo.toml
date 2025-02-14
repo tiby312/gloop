@@ -1,0 +1,8 @@
+[package]
+name = "gloop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gloo = "0.11.0"
+web-sys = "0.3.77"
