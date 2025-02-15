@@ -10,19 +10,23 @@ pub trait Listen{
     fn call(&mut self,a:&Event);
 }
 
-impl<F:FnMut(&Event)> Listen for F{
+
+impl<F:FnMut(&Event)> Listen for FnWrapper<F>{
     fn call(&mut self,a:&Event){
-        (*self)(a)
+        (self.0)(a)
     }
 }
 
+pub struct FnWrapper<F>(F);
 
 
 
-pub fn from_closure<F:FnMut(&Event),S>(target:&EventTarget,event_type:S,func:F)->EventListenerWrapper<impl Listen> where
-S: Into<Cow<'static, str>>,{
-    EventListenerWrapper::new(target,event_type,func)
-}
+
+
+// pub fn from_closure<F:FnMut(&Event),S>(target:&EventTarget,event_type:S,func:F)->EventListenerWrapper<impl Listen> where
+// S: Into<Cow<'static, str>>,{
+//     EventListenerWrapper::new(target,event_type,func)
+// }
 
 
 pub struct EventListenerWrapper<F>{
@@ -31,6 +35,13 @@ pub struct EventListenerWrapper<F>{
     
 }
 
+impl<F:FnMut(&Event)> EventListenerWrapper<FnWrapper<F>>{
+
+    pub fn from_closure<S>(target:&EventTarget,event_type:S,func:F)->EventListenerWrapper<FnWrapper<F>>
+     where S:Into<Cow<'static,str>>{
+        EventListenerWrapper::new(target,event_type,FnWrapper(func))
+    }
+}
 
 impl<F: Listen> EventListenerWrapper<F>{
     pub fn new<S>(target: &EventTarget, event_type: S, func: F) -> Self
