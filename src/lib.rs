@@ -33,10 +33,23 @@ impl<F:FnMut(&Event)> EventListen<FnWrapper<F>>{
      where S:Into<Cow<'static,str>>{
         EventListen::new(target,event_type,FnWrapper(func))
     }
+
+    pub fn from_closure_with_options<S>(target:&EventTarget,event_type:S,options:gloo::events::EventListenerOptions,func:F)->EventListen<FnWrapper<F>>
+     where S:Into<Cow<'static,str>>{
+        EventListen::new_with_options(target,event_type,options,FnWrapper(func))
+    }
 }
 
 impl<F: Listen> EventListen<F>{
     pub fn new<S>(target: &EventTarget, event_type: S, func: F) -> Self
+where
+    S: Into<Cow<'static, str>>,
+    {
+        let options = gloo::events::EventListenerOptions::default();
+        Self::new_with_options(target, event_type, options, func)
+    }
+
+    pub fn new_with_options<S>(target: &EventTarget, event_type: S, options:gloo::events::EventListenerOptions,func: F) -> Self
 where
     S: Into<Cow<'static, str>>,
     {
@@ -46,7 +59,7 @@ where
 
         
         let mut callback:Box<dyn Listen+'static>=unsafe{Box::from_raw(j)};
-        let options = gloo::events::EventListenerOptions::enable_prevent_default();
+        //let options = gloo::events::EventListenerOptions::enable_prevent_default();
 
         let e=EventListener::new_with_options(target,event_type,options,move|e|callback.call(e));
 
