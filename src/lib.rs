@@ -54,8 +54,9 @@ where
 
         
         let mut callback:Box<dyn Listen+'static>=unsafe{Box::from_raw(j)};
+        let options = gloo::events::EventListenerOptions::enable_prevent_default();
 
-        let e=EventListener::new(target,event_type,move|e|callback.call(e));
+        let e=EventListener::new_with_options(target,event_type,options,move|e|callback.call(e));
 
         EventListenerWrapper { _a: e, func:std::marker::PhantomData }
     }
