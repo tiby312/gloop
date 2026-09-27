@@ -15,7 +15,7 @@ impl EventHandler {
     }
 }
 
-pub fn register_event<F: FnMut(&Event)>(
+pub fn register_event(
     target: &EventTarget,
     event_type: &'static str,
 ) -> EventHandler {
